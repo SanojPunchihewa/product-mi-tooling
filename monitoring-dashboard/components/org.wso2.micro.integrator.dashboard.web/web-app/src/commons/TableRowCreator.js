@@ -19,6 +19,7 @@
  */
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import NodesCell from './NodesCell';
@@ -44,7 +45,7 @@ export default function TableRowCreator(props) {
             case 'nodes':
                 return <TableCell><table>{data.nodes.map(node=><NodesCell pageId={pageId} nodeData={node}/>)}</table></TableCell>
             case 'wsdlUrl':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.wsdl1_1} />)}</table></TableCell>
+                return <TableCell><table>{data.nodes.map(node=><LinkCell data={node.details.wsdl1_1} />)}</table></TableCell>
             
             case 'name':
                 return <TableCell>{data.name}</TableCell>
@@ -81,8 +82,13 @@ export default function TableRowCreator(props) {
 }
 
 function StringCell(props) {
-    var nodeData = props.data
-    return <tr><td>{nodeData}</td></tr>
+    var data = props.data
+    return <tr><td>{data}</td></tr>
+}
+
+function LinkCell(props) {
+    var data = props.data
+    return <tr><td><a href={data}>{data}</a></td></tr>
 }
 const useStyles = makeStyles((theme) => ({
     tableCell : {

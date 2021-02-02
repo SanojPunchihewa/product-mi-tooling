@@ -39,16 +39,17 @@ export default function ProxyService() {
     const selectedNodeList = useSelector(state => state.nodeList);
     
     React.useEffect(() => {
-        var nodeList="";
+        console.log("selectedNodeList", selectedNodeList)
+        var nodeListQueryParams="";
         selectedNodeList.filter(node => {
-            nodeList = nodeList.concat(node, '&nodes=')
+            nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
         })
-        // todo if nodelist [] dont perform this
-        const url = "http://0.0.0.0:9743/api/rest/groups/".concat(globalGroupId).concat("/proxy-services?nodes=").concat(nodeList.slice(0,-7));
+        const url = "http://0.0.0.0:9743/api/rest/groups/".concat(globalGroupId).concat("/proxy-services?nodes=").concat(nodeListQueryParams.slice(0,-7));
         axios.get(url).then(response => {
             response.data.map(data => 
                 data.nodes.map(node => node.details = JSON.parse(node.details))
             )
+            console.log("response.data",response.data)
             setProxyList(response.data)
         })
     },[globalGroupId, selectedNodeList])

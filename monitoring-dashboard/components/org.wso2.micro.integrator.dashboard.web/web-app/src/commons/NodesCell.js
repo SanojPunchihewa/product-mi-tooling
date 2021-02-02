@@ -29,6 +29,7 @@ import HomePageSideDrawer from './sidedrawers/HomePageSideDrawer';
 export default function NodesCell(props) {
     const classes = useStyles();
     const { pageId, nodeData } = props;
+    console.log("nodeData",nodeData)
 
     const [state, setState] = React.useState({
         openSideDrawer: false,
@@ -53,6 +54,7 @@ export default function NodesCell(props) {
 function SideDrawer(props) {
     switch(props.pageId) {
         case 'proxyPage':
+            console.log("props.nodeData",props.nodeData)
             return <ProxySideDrawer nodeData={props.nodeData} />
         default :
             return <HomePageSideDrawer nodeData={props.nodeData} />

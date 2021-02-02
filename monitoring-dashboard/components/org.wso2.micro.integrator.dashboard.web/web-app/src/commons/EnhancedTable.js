@@ -31,6 +31,7 @@ import TableRowCreator from './TableRowCreator';
 
 export default function EnhancedTable(props) {
     const { pageInfo, dataSet } = props;
+    console.log("dataSet",dataSet)
     var headCells = pageInfo.headCells;
     var rowCount = dataSet.length;
 
