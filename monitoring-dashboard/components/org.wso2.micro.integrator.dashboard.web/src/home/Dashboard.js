@@ -38,7 +38,6 @@ import Box from '@material-ui/core/Box';
 import Link from '@material-ui/core/Link';
 import { NavMenuItems, globalSettings } from './NavMenuItems';
 import clsx from 'clsx';
-import Avatar from '@material-ui/core/Avatar';
 import GroupSelector from './GroupSelector';
 import NodeFilter from './NodeFilter';
 import ProxyService from '../pages/ProxyService';
@@ -55,9 +54,15 @@ import Datasources from '../pages/Datasources';
 import Connectors from '../pages/Connectors';
 import CarbonApplications from '../pages/CarbonApplications';
 import LogFiles from '../pages/LogFiles'
+import PageNotFound from '../pages/NotFound'
+import Login from '../auth/Login'
+import AuthManager from '../auth/AuthManager';
 import logo from '../images/logo.svg';
 import { useDispatch } from 'react-redux';
 import { setBasePath } from '../redux/Actions';
+import {Redirect} from 'react-router';
+import Qs from 'qs';
+import { Button, Menu, MenuItem, Popover } from '@material-ui/core';
 
 export default function Dashboard() {
     const classes = useStyles();
@@ -69,9 +74,30 @@ export default function Dashboard() {
         setOpen(false);
     };
 
-    const windowLocation = window.location.href;
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const handlePopOverClick = event => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handlePopOverClose = () => {
+        setAnchorEl(null);
+    };
+
+    var serverURL = window.location.protocol+'//'+window.location.hostname+(window.location.port ? ':'+window.location.port: '');
     const dispatch = useDispatch();
-    dispatch(setBasePath(windowLocation))
+    dispatch(setBasePath(serverURL))
+
+    // if the user is not logged in Redirect to login
+    if (!AuthManager.isLoggedIn()) {
+        // let referrer = this.props.location.pathname;
+        // const arr = referrer.split('');
+        // if (arr[arr.length - 1] !== '/') {
+        //     referrer += '/';
+        // }
+        // const params = Qs.stringify({referrer});
+        return (
+            <Redirect to={{pathname: '/login'}}/>
+        );
+    }
 
     return (
         <div className={classes.root}>
@@ -103,14 +129,26 @@ export default function Dashboard() {
                                 </Typography>
                             </Box>
                             <GroupSelector/>
-                            <Box p={1}>
-                                <Avatar alt="Remy Sharp" src="/broken-image.jpg" className={classes.orange}>
-                                    B
-                                </Avatar>
-                            </Box>
-                            <Box p={1} style={{padding: '13px'}}>
-                                Admin
-                            </Box>
+                            <span>
+                                <Button variant="contained" color="primary" onClick={handlePopOverClick}>
+                                    Admin
+                                </Button>
+                                <Popover
+                                    open={anchorEl}
+                                    anchorEl={anchorEl}
+                                    onClose={handlePopOverClose}
+                                    anchorOrigin={{ horizontal: 'center', vertical: 'top' }}
+                                    targetOrigin={{ horizontal: 'right', vertical: 'top' }}
+                                >
+                                    <Menu
+                                        anchorEl={anchorEl}
+                                        keepMounted
+                                        open={Boolean(anchorEl)}
+                                        onClose={handlePopOverClose}>
+                                        <MenuItem component="a" href="/logout">Logout</MenuItem>
+                                    </Menu>
+                                </Popover>
+                            </span>
                         </Box>
                     </div>
                 </Toolbar>
@@ -140,6 +178,7 @@ export default function Dashboard() {
                         <Grid item xs={12}>
                             <Paper className={classes.paper}>
                                     <Switch>
+                                        <Route exact path='/login' component={Login} />
                                         <Route exact path='/' component={Nodes}/>
                                         <Route exact path='/proxy_services' component={ProxyService}/>
                                         <Route exact path='/endpoints' component={Endpoints}/>
@@ -154,6 +193,7 @@ export default function Dashboard() {
                                         <Route exact path='/connectors' component={Connectors}/>
                                         <Route exact path='/carbon_applications' component={CarbonApplications}/>
                                         <Route exact path='/log_files' component={LogFiles}/>
+                                        <Route path="" component={PageNotFound} />
                                     </Switch>
                             </Paper>
                         </Grid>
